@@ -1,63 +1,55 @@
-// src/context/Provider.js
-
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import CarsContext from './CarsContext';
+import redSignal from '../images/redSignal.jpeg';
+import yellowSignal from '../images/yellowSignal.jpeg';
+import greenSignal from '../images/greenSignal.jpeg';
 
-class Provider extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      cars: {
-        red: false,
-        blue: false,
-        yellow: false,
-      },
-      signal: {
-        color: 'red',
-      },
+function Provider({ children }) {
+  const [red, setRed] = useState(false);
+  const [blue, setBlue] = useState(false);
+  const [yellow, setYellow] = useState(false);
+  const [color, setColor] = useState('red');
+
+  function moveCar(car, side) {
+    if (color === 'green') {
+      if (car === 'red') setRed(side);
+      if (car === 'blue') setBlue(side);
+      if (car === 'yellow') setYellow(side);
     }
-    this.moveCar = this.moveCar.bind(this);
-    this.changeSignal = this.changeSignal.bind(this);
-  }
-
-  moveCar(car, side) {
-    this.setState({
-      cars: {
-        ...this.state.cars,
-        [car]: side,
-      },
-    });
+    return null;
   };
 
-  changeSignal(signalColor) {
-    this.setState({
-      signal: {
-        ...this.state.signal,
-        color: signalColor,
-      },
-    });
+  function changeSignal(signalColor) {
+    setColor(signalColor)
+    // if (color === 'red' || color === 'yellow') {
+    //   setRed(false);
+    //   setBlue(false);
+    //   setYellow(false);
+    // } para isso acontecer no momento da mudança do sinal, necessita de um useEffect!
   };
 
-  render() {
-    const context = {
-      ...this.state,
-      moveCar: this.moveCar,
-      changeSignal: this.changeSignal,
-    };
+  const renderSignal = (signalColor) => {
+    if (signalColor === 'red') return redSignal;
+    if (signalColor === 'yellow') return yellowSignal;
+    if (signalColor === 'green') return greenSignal;
+    return null;
+  };
 
-    const { children } = this.props;
+  const context = {
+    red,
+    blue,
+    yellow,
+    color,
+    moveCar,
+    changeSignal,
+    renderSignal,
+  };
 
-    return (
-      <CarsContext.Provider value={context}>
-        {children}
-      </CarsContext.Provider>
-    );
-  }
-};
-
-Provider.propTypes = {
-  children: PropTypes.node.isRequired,
+  return (
+    <CarsContext.Provider value={context}>
+      {children}
+    </CarsContext.Provider>
+  );
 };
 
 export default Provider;
